@@ -5,34 +5,29 @@ Wrapper functions for the networks
 import os
 import time
 
-# Torch
-import torch
-from torch import nn
-import torch.nn.functional as F
-from torch import pow, add, mul, div, sqrt, abs, square
-from torch.utils.tensorboard import SummaryWriter
-from tensorboard import program
-from torchsummary import summary
-from torch.optim import lr_scheduler
-from torchviz import make_dot
-# from network_model import Lorentz_layer
-from plotting_functions import plot_weights_3D, plotMSELossDistrib, \
-    compare_spectra, compare_spectra_with_params
-
-
 # Libs
 import matplotlib
+# Torch
+import torch
+import torch.nn.functional as F
+from tensorboard import program
+from torch import add, mul, div, square
+from torch import nn
+from torch.optim import lr_scheduler
+from torch.utils.tensorboard import SummaryWriter
+from torchviz import make_dot
+
+# from network_model import Lorentz_layer
+from plotting_functions import plot_weights_3D, plotMSELossDistrib, \
+    compare_spectra
+
 matplotlib.use('Agg')
 import numpy as np
-import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
-from scipy.signal import argrelmax
-
 
 
 class Network(object):
     def __init__(self, model_fn, flags, train_loader, test_loader,
-                 ckpt_dir=os.path.join(os.path.abspath(''), 'models'),
+                 ckpt_dir=os.path.join(os.path.abspath(''), 'models/sweep'),
                  inference_mode=False, saved_model=None):
         self.model_fn = model_fn                                # The network architecture object
         self.flags = flags                                      # The flags containing the hyperparameters
@@ -109,7 +104,7 @@ class Network(object):
         descend = torch.tensor([-1, 1, 0], requires_grad=False, dtype=torch.float32)
 
         if torch.cuda.is_available():
-            ascend = ascend.cuda()
+            ascend = ascend.cuda('cuda')
             descend = descend.cuda()
 
         max = F.relu(F.conv1d(labels.view(batch_size, 1, -1),
@@ -444,10 +439,10 @@ class Network(object):
                 # loss = self.local_lorentz_loss(w0,g,wp,logit,spectra,record)
                 loss = self.make_MSE_loss(logit, spectra)  # compute the loss
                 # loss = self.make_custom_loss(logit, spectra)
-                if j == 0 and epoch == 0:
-                    im = make_dot(loss, params=dict(self.model.named_parameters())).render("Model Graph",
-                                                                                           format="png",
-                                                                                           directory=self.ckpt_dir)
+                #if j == 0 and epoch == 0:
+                #    im = make_dot(loss, params=dict(self.model.named_parameters())).render("Model Graph",
+                 #                                                                          format="png",
+                  #                                                                         directory=self.ckpt_dir)
                 # print(loss)
                 loss.backward()
 

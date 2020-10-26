@@ -105,6 +105,10 @@ class Forward(nn.Module):
 
             e1 = torch.sum(e1, 1).type(torch.cfloat)
             e2 = torch.sum(e2, 1).type(torch.cfloat)
+
+            T = e2.float()
+
+            '''
             eps_inf = self.epsilon_inf.unsqueeze(1).expand_as(e1)
             e1 += eps_inf
             j = torch.tensor([0+1j],dtype=torch.cfloat).expand_as(e2)
@@ -125,6 +129,7 @@ class Forward(nn.Module):
             # R = div(square((n-ones).abs()),square((n+ones).abs()))
             # T_coeff = ones - R
             T = mul(div(4*n.real, add(square(n.real+1), square(n.imag))), alpha).float()
+            '''
 
             return T, w0_out, wp_out, g_out
 
